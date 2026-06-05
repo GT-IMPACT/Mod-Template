@@ -1,29 +1,37 @@
+import settings.getVersionMod
 
 plugins {
-    alias(libs.plugins.buildconfig)
-    groovy
-    id("minecraft")
-    id("publish")
-}
-
-repositories {
-    maven("https://maven.accident.space/repository/maven-public/")
-    maven("http://jenkins.usrv.eu:8081/nexus/content/groups/public/") { isAllowInsecureProtocol = true }
-    maven("https://jitpack.io")
-    maven("https://maven.ic2.player.to/") { metadataSources { mavenPom(); artifact() } }
-    mavenCentral()
-    mavenLocal()
+    alias(libs.plugins.setup.minecraft)
+    alias(libs.plugins.setup.publish)
+    id(libs.plugins.buildconfig.get().pluginId)
 }
 
 val modId: String by extra
 val modName: String by extra
 val modGroup: String by extra
+val modAdapter: String by extra
+
+extra.set("modVersion", getVersionMod())
 
 buildConfig {
-    packageName("space.impact.$modId")
+    packageName(modGroup)
     buildConfigField("String", "MODID", "\"${modId}\"")
     buildConfigField("String", "MODNAME", "\"${modName}\"")
-    buildConfigField("String", "VERSION", "\"${project.version}\"")
+    buildConfigField("String", "VERSION", "\"${getVersionMod()}\"")
     buildConfigField("String", "GROUPNAME", "\"${modGroup}\"")
-    useKotlinOutput { topLevelConstants = true }
+    buildConfigField("String", "MODADAPTER", "\"${modAdapter}\"")
+}
+
+repositories {
+    maven("https://maven.accident.space/repository/maven-public/") {
+        mavenContent {
+            includeGroup("space.impact")
+            includeGroup("com.github.GTNewHorizons")
+            includeGroupByRegex("space\\.impact\\..+")
+        }
+    }
+}
+
+dependencies {
+    api("space.impact:Forgelin:2.1.1")
 }
