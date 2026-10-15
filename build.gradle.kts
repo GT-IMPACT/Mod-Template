@@ -1,37 +1,26 @@
-import settings.getVersionMod
-
 plugins {
-    alias(libs.plugins.setup.minecraft)
-    alias(libs.plugins.setup.publish)
-    id(libs.plugins.buildconfig.get().pluginId)
+    id("minecraft-setup")
+    id("publish-setup")
 }
 
-val modId: String by extra
-val modName: String by extra
-val modGroup: String by extra
-val modAdapter: String by extra
-
-extra.set("modVersion", getVersionMod())
+impactMod {
+    modId.set("modid")
+    modName.set("Mod Name")
+    modGroup.set("space.impact.modid")
+    mavenGroup.set("space.impact")
+    mavenUrl.set("https://maven.accident.space/repository/maven-releases/")
+    injectGenerics.set(true)
+}
 
 buildConfig {
-    packageName(modGroup)
-    buildConfigField("String", "MODID", "\"${modId}\"")
-    buildConfigField("String", "MODNAME", "\"${modName}\"")
-    buildConfigField("String", "VERSION", "\"${getVersionMod()}\"")
-    buildConfigField("String", "GROUPNAME", "\"${modGroup}\"")
-    buildConfigField("String", "MODADAPTER", "\"${modAdapter}\"")
-}
-
-repositories {
-    maven("https://maven.accident.space/repository/maven-public/") {
-        mavenContent {
-            includeGroup("space.impact")
-            includeGroup("com.github.GTNewHorizons")
-            includeGroupByRegex("space\\.impact\\..+")
-        }
-    }
+    useJavaOutput()
+    packageName(impactMod.modGroup.get())
+    buildConfigField("String", "MODID", "\"${impactMod.modId.get()}\"")
+    buildConfigField("String", "MODNAME", "\"${impactMod.modName.get()}\"")
+    buildConfigField("String", "VERSION", "\"${project.version}\"")
+    buildConfigField("String", "GROUPNAME", "\"${impactMod.modGroup.get()}\"")
 }
 
 dependencies {
-    api("space.impact:Forgelin:2.1.1")
+    api(libs.impact.forgelin)
 }
